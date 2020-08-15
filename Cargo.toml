@@ -8,7 +8,6 @@ A small utility that can parse the iana language subtag registry file, as
 found at: \
 https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry."""
 license = "BSD-2-Clause"
-license-file = "LICENSE"
 readme = "Readme.md"
 keywords = ["iana", "language", "subtag", "registry" ]
 categories = ["command-line-utilities", "parser-implementations" ]
@@ -19,3 +18,5 @@ documentation = "https://docs.rs/lsr-rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+nom = "6.0.0-alpha1"
+chrono = "0.4.15"

@@ -1,0 +1,77 @@
+date = @{ ASCII_DIGIT{4} ~ hyphen ~ ASCII_DIGIT{2} ~ hyphen ~ ASCII_DIGIT{2} }
+
+type_field = @{
+  type_field_header ~ colon ~ space ~
+  (type_extlang_terminal
+        | type_grandfathered_terminal
+        | type_language_terminal
+        | type_redundant_terminal
+        | type_region_terminal
+        | type_script_terminal
+        | type_variant_terminal)
+  ~ NEWLINE
+}
+
+added = { added_field_header ~ colon ~ space ~ date ~ NEWLINE }
+
+deprecated = { deprecated_field_header ~ colon ~ space ~ date ~ NEWLINE }
+
+file_date = { file_date_field_header ~ colon ~ space ~ date ~ NEWLINE }
+
+string_field_header = {
+  comments_field_header
+  | description_field_header
+  | macro_language_field_header
+  | preferred_value_field_header
+  | prefix_field_header
+  | subtag_field_header
+  | suppress_script_field_header
+  | tag_field_header
+}
+
+string_value = { ((&(NEWLINE ~ space{2}) ~ ANY) | (!NEWLINE ~ ANY))+ }
+
+string_field = {
+  string_field_header ~ colon ~ space ~ string_value ~ NEWLINE
+}
+
+fixed_field = { added | deprecated | type_field }
+
+record = {
+  record_start ~ (fixed_field | string_field)+
+}
+
+file = _{ SOI ~ file_date ~ (record)* ~ EOI }
+
+hyphen = _{ "-" }
+colon = _{ ":" }
+space = _{ " " }
+record_start = _{ "%%" ~ NEWLINE }
+
+added_field_header = @{ "Added" }
+comments_field_header = @{ "Comments" }
+deprecated_field_header = @{ "Deprecated" }
+description_field_header = @{ "Description" }
+file_date_field_header = @{ "File-Date" }
+macro_language_field_header = @{ "Macrolanguage" }
+preferred_value_field_header = @{ "Preferred-Value" }
+prefix_field_header = @{ "Prefix" }
+
+scope_collection_terminal = @{ "collection" }
+scope_field_header = @{ "Scope" }
+scope_macrolanguage_terminal = @{ "macrolanguage" }
+scope_private_use_terminal = @{ "private-use" }
+scope_special_terminal = @{ "special" }
+
+subtag_field_header = @{ "Subtag" }
+suppress_script_field_header = @{ "Suppress-Script" }
+tag_field_header = @{ "Tag" }
+
+type_extlang_terminal  = @{ "extlang" }
+type_field_header = @{ "Type" }
+type_grandfathered_terminal  = @{ "grandfathered" }
+type_language_terminal  = @{ "language" }
+type_redundant_terminal  = @{ "redundant" }
+type_region_terminal  = @{ "region" }
+type_script_terminal  = @{ "script" }
+type_variant_terminal  = @{ "variant" }

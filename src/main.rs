@@ -13,6 +13,7 @@ fn main() {
     println!("Hello, world!");
 }
 
+#[derive(Debug,PartialEq)]
 enum Type {
     Extlang,
     Grandfathered,
@@ -23,6 +24,22 @@ enum Type {
     Variant
 }
 
+impl Type {
+    fn from_str(input: &str) -> Option<Self>{
+        match input {
+            "extlang" => Some(Type::Extlang),
+            "grandfathered" => Some(Type::Grandfathered),
+            "language" => Some(Type::Language),
+            "redundant" => Some(Type::Redundant),
+            "region" => Some(Type::Region),
+            "script" => Some(Type::Script),
+            "variant" => Some(Type::Variant),
+            _ => None
+        }
+    }
+}
+
+#[derive(Debug,PartialEq)]
 enum Scope {
     Collection,
     Macrolanguage,
@@ -30,6 +47,7 @@ enum Scope {
     Special
 }
 
+#[derive(Debug,PartialEq)]
 struct Record {
     added: Option<NaiveDate>,
     deprecated: Option<NaiveDate>,
@@ -45,6 +63,7 @@ struct Record {
     tag: Option<String>
 }
 
+#[derive(Debug,PartialEq)]
 struct SubTagList {
     file_date: NaiveDate,
     records: Vec<Record>,
@@ -69,6 +88,18 @@ named!(get_file_date_value<&str, NaiveDate>,
     terminated!(preceded!(tag!("File-Date: "), date), char!('\n'))
 );
 
+
+fn type_value(input: &str) -> IResult<&str, Type> {
+    map!(
+        take_until!("\n"),
+        |s| Type::from_str(s)
+    )
+}
+
+named!(get_type_value<&str, Type>,
+    terminated!(preceded!(tag!("Type: "), type_value), char!('\n'))
+);
+
 #[allow(dead_code)]
 fn parse(to_parse: &str) -> io::Result<SubTagList> {
     Ok(SubTagList {
@@ -88,6 +119,17 @@ mod tests {
         let actual = get_file_date_value(to_parse);
         match actual {
             Ok((_, some_date)) => assert_eq!(some_date, expected),
+            nok => assert!(false, "err: [{:?}]", nok)
+        };
+    }
+
+    #[test]
+    fn test_get_type_value() {
+        let expected = Type::Language;
+        let to_parse = "Type: language\n";
+        let actual = get_type_value(to_parse);
+        match actual {
+            Ok((_, some_type)) => assert_eq!(some_type, expected),
             nok => assert!(false, "err: [{:?}]", nok)
         };
     }
